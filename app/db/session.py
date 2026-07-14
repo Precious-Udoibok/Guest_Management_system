@@ -1,8 +1,7 @@
-from sqlmodel import create_engine
+from sqlmodel import create_engine, Session  # noqa
 from app.core.config import settings
 import logging
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 if settings.USE_SQLITE:

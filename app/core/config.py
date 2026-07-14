@@ -8,10 +8,10 @@ class Settings(BaseSettings):
     SERVER_NAME: str = "localhost"
     SERVER_HOST: str = "http://localhost:8000"
     FIRST_SUPERUSER: str = "admin"
-    FIRST_SUPERUSER_PASSWORD: str = "string"
+    FIRST_SUPERUSER_PASSWORD: str = ""
     API_V1_STR: str = "/api/v1"
 
-    SECRET_KEY: str
+    SECRET_KEY: str = "project_secret_key"
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 11520
 

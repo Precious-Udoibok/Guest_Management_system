@@ -1,0 +1,14 @@
+repos:
+  # Handles Ruff (lint + format + import sort + autoflake)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.3
+    hooks:
+      - id: ruff
+        args: ["--fix"] # Auto-fix lint issues
+      - id: ruff-format # Format code
+
+    # Flake8 
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8

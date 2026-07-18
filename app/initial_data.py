@@ -4,6 +4,8 @@ from app import models  # noqa: F401
 from app.db.init_db import init_db
 from app.db.session import Session, engine
 
+# Setup logging once at app startup
+logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 

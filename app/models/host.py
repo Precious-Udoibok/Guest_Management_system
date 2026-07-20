@@ -13,8 +13,8 @@ class HostStatus(BaseEnum):
 
 class HostBase(ModelBase):
     name: str
-    email: EmailStr
-    phone: str
+    email: EmailStr = Field(index=True, unique=True)
+    phone: str = Field(index=True, unique=True)
     department: str
     status: HostStatus = Field(default=HostStatus.available)
 

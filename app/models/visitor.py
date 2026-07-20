@@ -1,6 +1,6 @@
 from typing import Optional, List
 from pydantic import EmailStr
-from sqlmodel import Relationship
+from sqlmodel import Relationship, Field
 
 from .base import ModelBase, SchemaBase
 from .meeting import Meeting
@@ -8,8 +8,8 @@ from .meeting import Meeting
 
 class VisitorBase(ModelBase):
     name: str
-    email: EmailStr
-    phone: str
+    email: EmailStr = Field(index=True, unique=True)
+    phone: str = Field(index=True, unique=True)
     address: str
 
 

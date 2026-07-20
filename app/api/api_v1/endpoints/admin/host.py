@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import Annotated, Optional
+from typing import Annotated
 from sqlmodel import Session
 
 from app.api import deps
@@ -32,7 +32,7 @@ def create_host(session: CommonSession, data: HostCreate) -> Host:
 
 
 @router.patch("/{id}", response_model=HostRead)
-def update_host(session: CommonSession, id: int, data: Optional[HostUpdate]) -> Host:
+def update_host(session: CommonSession, id: int, data: HostUpdate) -> Host:
     """
     Update a specific field in the HostUpdate schema by host id
     Authentication Authentication coming soon...

@@ -3,7 +3,7 @@ from typing import Annotated, List, Optional
 from sqlmodel import Session
 
 from app.actions import host_action as ha
-from app.models import Host, HostRead, HostStatus
+from app.models import Host, HostRead, HostStatus, HostDepartment
 from app.api import deps
 
 
@@ -16,13 +16,12 @@ CommonSession = Annotated[Session, Depends(deps.get_session)]
 def get_all_specific_hosts(
     session: CommonSession,
     status: Optional[HostStatus] = None,
-    department: Optional[str] = None,
-    name: Optional[str] = None,
+    department: Optional[HostDepartment] = None,
 ):
     """
     Get all the specific hosts either by status, department or name
     """
-    return ha.filter_hosts(session=session, status=status, department=department, name=name)
+    return ha.filter_hosts(session=session, status=status, department=department)
 
 
 @router.get("/", response_model=List[HostRead])

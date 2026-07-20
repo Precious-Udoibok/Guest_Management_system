@@ -11,11 +11,24 @@ class HostStatus(BaseEnum):
     unavailable = "unavailable"
 
 
+class HostDepartment(BaseEnum):
+    energy_services = "energy_services"
+    digital_services = "digital_services"
+    learning_services = "learning_services"
+    innovation_services = "innovation_services"
+    coroperate_finance = "coroperate_finance"
+    coroperate_operations = "coroperate_innovation"
+    human_resouce = "human_resource"
+    business_locations = "business_locations"
+    technology_innovation = "technology_innovation"
+    marketing_communication = "marketing_communication"
+
+
 class HostBase(ModelBase):
     name: str
     email: EmailStr = Field(index=True, unique=True)
     phone: str = Field(index=True, unique=True)
-    department: str
+    department: HostDepartment
     status: HostStatus = Field(default=HostStatus.available)
 
 
@@ -27,7 +40,7 @@ class HostCreate(SchemaBase):
     name: str
     email: EmailStr
     phone: str
-    department: str
+    department: HostDepartment
     status: HostStatus = Field(default=HostStatus.available)
 
 
@@ -39,5 +52,5 @@ class HostUpdate(SchemaBase):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
-    department: Optional[str] = None
+    department: Optional[HostDepartment] = None
     status: Optional[HostStatus] = None

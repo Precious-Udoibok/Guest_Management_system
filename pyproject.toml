@@ -6,7 +6,7 @@ package-mode = false
 authors = ["Precious Udoibok <preciousudoibok@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0"
+python = ">=3.10,<3.13"
 
 # API Framework
 fastapi = ">=0.111.0,<1"

@@ -2,6 +2,7 @@ import enum
 import random
 from sqlmodel import SQLModel, text, func, Field
 from typing import Optional
+from datetime import datetime
 
 
 class SchemaBase(SQLModel):
@@ -11,10 +12,10 @@ class SchemaBase(SQLModel):
 
 class ModelBase(SchemaBase):
     id: Optional[int] = Field(default=None, primary_key=True)
-    created_at: Optional[str] = Field(
+    created_at: Optional[datetime] = Field(
         sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")}, nullable=False
     )
-    updated_at: Optional[str] = Field(
+    updated_at: Optional[datetime] = Field(
         sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP"), "onupdate": func.now()},
         nullable=False,
     )

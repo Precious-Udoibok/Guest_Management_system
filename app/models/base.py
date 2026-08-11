@@ -1,23 +1,27 @@
 import enum
 import random
 from sqlmodel import SQLModel, text, func, Field
-from typing import Optional
 from datetime import datetime
+from pydantic import ConfigDict
 
 
 class SchemaBase(SQLModel):
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(
+        from_attributes=True, use_enum_values=True, coerce_numbers_to_str=True
+    )
 
 
 class ModelBase(SchemaBase):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_at: Optional[datetime] = Field(
-        sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")}, nullable=False
+    id: int | None = Field(default=None, primary_key=True)
+    created_at: datetime | None = Field(
+        sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")},
+        nullable=False,
+        # default=None
     )
-    updated_at: Optional[datetime] = Field(
+    updated_at: datetime | None = Field(
         sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP"), "onupdate": func.now()},
         nullable=False,
+        # default=None,
     )
 
 

@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "gms-backend"
+name = "Checkpoint-backend"
 version = "0.1.0"
-description = "Guest Management System Backend"
+description = "Checkpoint Backend"
 package-mode = false
 authors = ["Precious Udoibok <preciousudoibok@gmail.com>"]
 

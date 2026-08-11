@@ -6,6 +6,7 @@ from .user import (
     UserStatus,
     UserDepartment,
     AvailabilityStatus,
+    UserRole,
 )
 from .meeting import (
     Meeting,

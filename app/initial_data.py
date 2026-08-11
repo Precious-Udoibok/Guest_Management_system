@@ -3,6 +3,7 @@ import logging
 from app import models  # noqa: F401
 from app.db.init_db import init_db
 from app.db.session import Session, engine
+from app.seed.seeders import admin
 
 # Setup logging once at app startup
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +17,7 @@ def init() -> None:
         init_db(engine, create_tables=True)
 
     # seed data
+    admin.seed_admin()
 
 
 def main() -> None:

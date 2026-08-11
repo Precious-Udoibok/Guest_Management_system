@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     SERVER_HOST: str = "http://localhost:8000"
     FIRST_SUPERUSER: str = "admin"
     FIRST_SUPERUSER_PASSWORD: str = ""
+    FIRST_SUPERUSER_PHONE: str = ""
     API_V1_STR: str = "/api/v1"
 
     SECRET_KEY: str = "project_secret_key"

@@ -51,6 +51,7 @@ class UserBase(ModelBase):
 
 
 class User(UserBase, table=True):
+    hashed_password: str | None = None
     meetings: List["Meeting"] = Relationship(back_populates="user")
 
 

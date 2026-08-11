@@ -1,51 +1,59 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
+from pydantic import EmailStr
 
 from sqlmodel import Relationship, Field
 
 from .base import BaseEnum, ModelBase, SchemaBase
 
 if TYPE_CHECKING:
-    from .host import Host, HostRead  # noqa: F401
-    from .visitor import Visitor, VisitorRead  # Noqa: F401
+    from .user import User  # noqa: F401
 
 
 class MeetingStatus(BaseEnum):
-    checked_in = "checked_in"
-    checked_out = "checked_out"
-    cancelled = "cancelled"
+    pending = "pending"
+    rejected = "rejected"
+    ongoing = "ongoing"
+    completed = "completed"
 
 
 class MeetingBase(ModelBase):
-    purpose: str
-    check_out_time: Optional[datetime] = Field(default=None, nullable=True)
-    status: MeetingStatus = Field(default=MeetingStatus.checked_in)
+    user_id: int = Field(foreign_key="user.id")
+    visitor_name: str
+    visitor_email: EmailStr
+    visitor_phone: str
+    reason: str
+    rejection_reason: str | None = Field(default=None)
+    check_out_time: datetime | None = Field(default=None, nullable=True)
+    status: MeetingStatus = Field(default=MeetingStatus.pending)
 
 
 class Meeting(MeetingBase, table=True):
-    """An associate table for hosts and visitors which has a many to many relationship"""
-
-    host_id: int = Field(foreign_key="host.id")
-    visitor_id: int = Field(foreign_key="visitor.id")
-
     # relationships
-    host: "Host" = Relationship(back_populates="meetings")
-    visitor: "Visitor" = Relationship(back_populates="meetings")
+    user: "User" = Relationship(back_populates="meetings")
 
 
 class MeetingCreate(SchemaBase):
-    purpose: str
-    host_id: int
-    visitor_id: int
+    user_id: int
+    visitor_name: str
+    visitor_email: EmailStr
+    visitor_phone: str
+    reason: str
 
 
 class MeetingRead(MeetingBase):
     id: int
-    host: "HostRead"
-    visitor: "VisitorRead"
 
 
 class MeetingUpdate(SchemaBase):
-    purpose: Optional[str] = None
-    check_out_time: Optional[datetime] = None
-    status: Optional[MeetingStatus] = None
+    visitor_name: str | None = None
+    visitor_email: EmailStr | None = None
+    visitor_phone: str | None = None
+    reason: str | None = None
+    rejection_reason: str | None = None
+    check_out_time: datetime | None = None
+    status: MeetingStatus | None = None
+
+
+class MeetingReject(SchemaBase):
+    rejection_reason: str

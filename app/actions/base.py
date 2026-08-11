@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Optional, Type, List
+from typing import Any, Generic, TypeVar, Optional, Type, List
 from pydantic import BaseModel
 from sqlmodel import SQLModel, Session, select
 
@@ -57,12 +57,21 @@ class ModelAction(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             session.rollback()
             raise
 
-    def update(self, session: Session, *, model: ModelType, data: UpdateSchemaType) -> ModelType:
+    def update(
+        self,
+        session: Session,
+        *,
+        model: ModelType,
+        data: UpdateSchemaType | None = None,
+        update: dict[str, Any] | None = None,
+    ) -> ModelType:
         """
         Update the selected model instance with new data
         """
         try:
-            update_data = data.model_dump(exclude_unset=True)
+            update_data = data.model_dump(exclude_unset=True) if data else {}
+            if update:
+                update_data.update(update)
 
             for key, value in update_data.items():
                 setattr(model, key, value)

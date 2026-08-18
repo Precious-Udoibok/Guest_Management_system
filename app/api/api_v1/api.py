@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.api_v1.endpoints import admin, meeting, auth
+from app.api.api_v1.endpoints import admin, meeting, auth, staff
 
 api_router = APIRouter()
 
@@ -9,7 +9,7 @@ api_router = APIRouter()
 # api_router.include_router(visitor.router, prefix="/visitor", tags=["Visitor"])
 api_router.include_router(meeting.router, prefix="/meeting", tags=["Meeting"])
 api_router.include_router(auth.router, tags=["Auth"])
-
+api_router.include_router(staff.router, prefix="/staff", tags=["Staff"])
 
 # admin routes
 api_router.include_router(admin.router, prefix="/admin")

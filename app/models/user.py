@@ -39,15 +39,15 @@ class UserDepartment(BaseEnum):
 
 
 class UserBase(ModelBase):
-    first_name: str
-    last_name: str
+    first_name: str | None = Field(default=None)
+    last_name: str | None = Field(default=None)
     email: EmailStr = Field(index=True, unique=True)
     role: UserRole = Field(default=UserRole.staff)
-    phone: str = Field(index=True, unique=True)
-    password: str
+    phone: str | None = Field(index=True, unique=True, default=None)
+    password: str | None = None
     department: UserDepartment = Field(default=UserDepartment.energy_services)
     availability_status: AvailabilityStatus = Field(default=AvailabilityStatus.available)
-    account_status: UserStatus = Field(default=UserStatus.active)
+    account_status: UserStatus = Field(default=UserStatus.inactive)
 
 
 class User(UserBase, table=True):
@@ -56,11 +56,11 @@ class User(UserBase, table=True):
 
 
 class UserCreate(SchemaBase):
-    first_name: str
-    last_name: str
+    first_name: str | None = None
+    last_name: str | None = None
     email: EmailStr = Field(index=True, unique=True)
     role: UserRole = Field(default=UserRole.staff)
-    phone: str
+    phone: str | None = None
     password: str
     department: UserDepartment = Field(default=UserDepartment.energy_services)
     availability_status: AvailabilityStatus = Field(default=AvailabilityStatus.available)
@@ -81,3 +81,7 @@ class UserUpdate(SchemaBase):
     department: UserDepartment | None = None
     availability_status: AvailabilityStatus | None = None
     account_status: UserStatus | None = None
+
+
+class UserStaffCreate(SchemaBase):
+    email: EmailStr

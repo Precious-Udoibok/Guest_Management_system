@@ -12,6 +12,7 @@ from app.models import (
     MeetingStatus,
     AvailabilityStatus,
     MeetingReject,
+    Meeting,
 )
 
 router = APIRouter()
@@ -20,7 +21,7 @@ CommonSession = Annotated[Session, Depends(deps.get_session)]
 
 
 @router.post("/", response_model=MeetingRead)
-def create_meeting(session: CommonSession, data: MeetingCreate):
+def create_meeting(session: CommonSession, data: MeetingCreate) -> Meeting:
     """
     Create a new meeting
     """
@@ -51,34 +52,67 @@ def get_all_meetings(
     search: str | None = None,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
-):
+) -> list[Meeting]:
     """
     Get all meetings by status and search
     """
-    return ma.search(session=session, status=status, search=search, offset=offset, limit=limit)
+
+    filters = []
+
+    if status:
+        filters.append(Meeting.status == status)
+
+    return ma.search(
+        session=session,
+        search=search,
+        search_fields=[
+            Meeting.visitor_name,
+            Meeting.visitor_email,
+            Meeting.visitor_phone,
+        ],
+        filters=filters,
+        offset=offset,
+        limit=limit,
+    )
 
 
 @router.get("/staff/{user_id}", response_model=list[MeetingRead])
 def get_staff_meetings(
     session: CommonSession,
     user_id: int,
-    status: str | None = None,
+    status: MeetingStatus | None = None,
     search: str | None = None,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
-):
+) -> list[Meeting]:
     """
     Authentication coming soon...
     Get all meetings for a specific staff member by user id
     """
-    #
+    filters = []
+
+    if status:
+        filters.append(Meeting.status == status)
+
+    if user_id:
+        filters.append(Meeting.user_id == user_id)
+
     return ma.search(
-        session=session, user_id=user_id, status=status, search=search, offset=offset, limit=limit
+        session=session,
+        search=search,
+        search_fields=[
+            Meeting.visitor_name,
+            Meeting.visitor_email,
+            Meeting.visitor_phone,
+        ],
+        filters=filters,
+        offset=offset,
+        limit=limit,
     )
 
 
 @router.patch("/{id}/approve", response_model=MeetingRead)
-def approve_meeting(session: CommonSession, id: int):
+def approve_meeting(session: CommonSession, id: int) -> Meeting:
     """
     Authentication coming soon...
     Approve a specific meeting by id
@@ -112,7 +146,7 @@ def approve_meeting(session: CommonSession, id: int):
 
 
 @router.patch("/{id}/reject", response_model=MeetingRead)
-def reject_meeting(session: CommonSession, id: int, data: MeetingReject):
+def reject_meeting(session: CommonSession, id: int, data: MeetingReject) -> Meeting:
     """
     Authentication coming soon...
     Reject a specific meeting by id
@@ -135,7 +169,7 @@ def reject_meeting(session: CommonSession, id: int, data: MeetingReject):
 
 
 @router.patch("/{id}/complete", response_model=MeetingRead)
-def complete_meeting(session: CommonSession, id: int):
+def complete_meeting(session: CommonSession, id: int) -> Meeting:
     """
     Authentication coming soon...
     Complete a specific meeting by id by setting the status to completed

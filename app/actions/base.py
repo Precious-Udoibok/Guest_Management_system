@@ -1,6 +1,6 @@
 from typing import Any, Generic, TypeVar, Optional, Type, List
 from pydantic import BaseModel
-from sqlmodel import SQLModel, Session, select
+from sqlmodel import SQLModel, Session, select, or_
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -100,3 +100,25 @@ class ModelAction(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         except Exception:
             session.rollback()
             raise
+
+    def search(
+        self,
+        session: Session,
+        *,
+        search: str | None = None,
+        search_fields: list[Any] | None = None,
+        filters: list[Any] | None = None,
+        offset: int = 0,
+        limit: int = 100,
+    ) -> List[ModelType]:
+        statement = select(self.model)
+
+        if filters:
+            statement = statement.where(*filters)
+
+        if search and search_fields:
+            statement = statement.where(or_(field.ilike(f"%{search}%") for field in search_fields))
+
+        statement = statement.offset(offset).limit(limit)
+
+        return session.exec(statement).all()

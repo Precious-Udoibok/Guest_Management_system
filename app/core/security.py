@@ -2,6 +2,8 @@ import bcrypt
 from typing import Any
 from datetime import timedelta, datetime, timezone
 from jose import jwt
+import string
+import secrets
 
 ALGORITHM = "HS256"
 
@@ -39,3 +41,9 @@ def create_access_token(
         to_encode.update({"exp": expire})
 
     return jwt.encode(to_encode, secret_key, algorithm=ALGORITHM)
+
+
+def generate_random_password(length: int = 12) -> str:
+    characters = string.ascii_letters + string.digits
+
+    return "".join(secrets.choice(characters) for _ in range(length))

@@ -8,6 +8,7 @@ from .user import (
     AvailabilityStatus,
     UserRole,
     UserStaffCreate,
+    UserPublic,
 )
 from .meeting import (
     Meeting,

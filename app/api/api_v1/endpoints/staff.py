@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 from app.api import deps
 from app.models import (
-    UserRead,
+    UserPublic,
     User,
     UserRole,
     UserDepartment,
@@ -16,13 +16,13 @@ router = APIRouter()
 CommonSession = Annotated[Session, Depends(deps.get_session)]
 
 
-@router.get("/", response_model=list[UserRead])
+@router.get("/", response_model=list[UserPublic])
 def get_staff(
     session: CommonSession,
     search: str | None = None,
     role: UserRole | None = None,
     department: UserDepartment | None = None,
-) -> list[User]:
+) -> list[UserPublic]:
     """
     get a staff by name or email or department
     """

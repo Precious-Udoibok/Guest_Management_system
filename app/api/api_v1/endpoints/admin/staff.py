@@ -43,30 +43,15 @@ def register_staff(
         model=new_staff,
         update={
             "role": UserRole.staff,
-            "password": generated_password,
             "hashed_password": get_password_hash(generated_password),
         },
     )
 
-    # # create a staff
-    # new_staff = User(
-    #     email=data.email,
-    #     role=UserRole.staff,
-    #     password=generated_password,
-    #     hashed_password=get_password_hash(generated_password),
-    #     account_status=UserStatus.inactive,
-    #     availability_status=AvailabilityStatus.available,
-    # )
 
-    # sends the deatils through email
-
-    # return ua.create(session, data=data)
-
-
-@router.post("/{staff_id}/reset-passowrd")
+@router.post("/{staff_id}/reset-password", response_model=UserRead)
 def reset_password(
     session: CommonSession,
-    data: UserStaffCreate,
+    staff_id: int,
     authorized: bool = Depends(rbac.RoleCheck([UserRole.admin])),
     current_user: User = Depends(deps.get_current_active_account),
 ):
@@ -74,16 +59,14 @@ def reset_password(
     Reset a staff password
     Email configuration coming soon...
     """
-    existing_staff = ua.get_by_email(session, email=data.email)
+    existing_staff = ua.get(session, id=staff_id)
     if not existing_staff:
-        raise HTTPException(
-            status_code=400, detail="This email address does not   exists in the system"
-        )
+        raise HTTPException(status_code=404, detail="This staff does not exist in the system")
 
     if existing_staff.role != UserRole.staff:
         raise HTTPException(status_code=400, detail="This user is not a staff")
 
-        # password
+    # password
     generated_password = generate_random_password(10)
 
     # send the newpassword to their email
@@ -92,7 +75,6 @@ def reset_password(
         session=session,
         model=existing_staff,
         update={
-            "password": generated_password,
             "hashed_password": get_password_hash(generated_password),
         },
     )
@@ -100,8 +82,8 @@ def reset_password(
     # return {"message": "Staff password has been reset successfully"}
 
 
-@router.post("{staff_id}/disable")
-def disable_acoucnt(
+@router.post("/{staff_id}/disable", response_model=UserRead)
+def disable_account(
     session: CommonSession,
     staff_id: int,
     authorized: bool = Depends(rbac.RoleCheck([UserRole.admin])),
@@ -112,7 +94,7 @@ def disable_acoucnt(
     """
     staff = ua.get(session, id=staff_id)
     if not staff:
-        raise HTTPException(status_code=404, detail="This staff does not exists in the system")
+        raise HTTPException(status_code=404, detail="This staff does not exist in the system")
 
     if staff.account_status == UserStatus.inactive:
         raise HTTPException(status_code=400, detail="The account is already disabled")
@@ -123,7 +105,7 @@ def disable_acoucnt(
     return ua.update(session=session, model=staff, update={"account_status": UserStatus.inactive})
 
 
-@router.post("{staff_id}/enable")
+@router.post("/{staff_id}/enable", response_model=UserRead)
 def enable_account(
     session: CommonSession,
     staff_id: int,
@@ -135,7 +117,7 @@ def enable_account(
     """
     staff = ua.get(session, id=staff_id)
     if not staff:
-        raise HTTPException(status_code=404, detail="This staff does not exists in the system")
+        raise HTTPException(status_code=404, detail="This staff does not exist in the system")
 
     if staff.account_status == UserStatus.active:
         raise HTTPException(status_code=400, detail="The account is already enabled")

@@ -33,9 +33,11 @@ def get_current_account(
     if not user:
         raise HTTPException(status_code=404, detail="Account not found")
 
+    return user
+
 
 def get_current_active_account(current_user: User = Depends(get_current_account)) -> User:
-    if not current_user.account_status != UserStatus.active:
+    if current_user.account_status != UserStatus.active:
         raise HTTPException(status_code=403, detail="inactive user account")
 
     return current_user

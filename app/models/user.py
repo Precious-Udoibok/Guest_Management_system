@@ -44,7 +44,6 @@ class UserBase(ModelBase):
     email: EmailStr = Field(index=True, unique=True)
     role: UserRole = Field(default=UserRole.staff)
     phone: str | None = Field(index=True, unique=True, default=None)
-    password: str | None = None
     department: UserDepartment = Field(default=UserDepartment.energy_services)
     availability_status: AvailabilityStatus = Field(default=AvailabilityStatus.available)
     account_status: UserStatus = Field(default=UserStatus.inactive)
@@ -69,6 +68,14 @@ class UserCreate(SchemaBase):
 
 class UserRead(UserBase):
     id: int
+
+
+class UserPublic(SchemaBase):
+    id: int
+    first_name: str | None = None
+    last_name: str | None = None
+    department: UserDepartment
+    availability_status: AvailabilityStatus
 
 
 class UserUpdate(SchemaBase):

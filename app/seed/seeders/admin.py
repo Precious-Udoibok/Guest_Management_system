@@ -22,7 +22,6 @@ def seed_admin():
             last_name="User",
             email=settings.FIRST_SUPERUSER,
             phone=settings.FIRST_SUPERUSER_PHONE,
-            password=settings.FIRST_SUPERUSER_PASSWORD,
             hashed_password=get_password_hash(settings.FIRST_SUPERUSER_PASSWORD),
             role=UserRole.admin,
             department=UserDepartment.coroperate_operations,

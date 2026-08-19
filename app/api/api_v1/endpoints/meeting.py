@@ -4,7 +4,7 @@ from sqlmodel import Session
 from datetime import datetime
 
 from app.actions import meeting_action as ma, user_action as ua
-from app.api import deps
+from app.api import deps, rbac
 from app.models import (
     MeetingRead,
     MeetingCreate,
@@ -13,6 +13,8 @@ from app.models import (
     AvailabilityStatus,
     MeetingReject,
     Meeting,
+    UserRole,
+    User,
 )
 
 router = APIRouter()
@@ -52,6 +54,8 @@ def get_all_meetings(
     search: str | None = None,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
+    current_user: User = Depends(deps.get_current_active_account),
 ) -> list[Meeting]:
     """
     Get all meetings by status and search
@@ -84,9 +88,10 @@ def get_staff_meetings(
     search: str | None = None,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
+    current_user: User = Depends(deps.get_current_active_account),
 ) -> list[Meeting]:
     """
-    Authentication coming soon...
     Get all meetings for a specific staff member by user id
     """
     filters = []
@@ -112,9 +117,13 @@ def get_staff_meetings(
 
 
 @router.patch("/{id}/approve", response_model=MeetingRead)
-def approve_meeting(session: CommonSession, id: int) -> Meeting:
+def approve_meeting(
+    session: CommonSession,
+    id: int,
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
+    current_user: User = Depends(deps.get_current_active_account),
+) -> Meeting:
     """
-    Authentication coming soon...
     Approve a specific meeting by id
     """
     # check if meeting exists
@@ -146,9 +155,14 @@ def approve_meeting(session: CommonSession, id: int) -> Meeting:
 
 
 @router.patch("/{id}/reject", response_model=MeetingRead)
-def reject_meeting(session: CommonSession, id: int, data: MeetingReject) -> Meeting:
+def reject_meeting(
+    session: CommonSession,
+    id: int,
+    data: MeetingReject,
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
+    current_user: User = Depends(deps.get_current_active_account),
+) -> Meeting:
     """
-    Authentication coming soon...
     Reject a specific meeting by id
     """
     # check if meeting exists
@@ -169,9 +183,13 @@ def reject_meeting(session: CommonSession, id: int, data: MeetingReject) -> Meet
 
 
 @router.patch("/{id}/complete", response_model=MeetingRead)
-def complete_meeting(session: CommonSession, id: int) -> Meeting:
+def complete_meeting(
+    session: CommonSession,
+    id: int,
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
+    current_user: User = Depends(deps.get_current_active_account),
+) -> Meeting:
     """
-    Authentication coming soon...
     Complete a specific meeting by id by setting the status to completed
     Toggle the status of the staff to available
     """

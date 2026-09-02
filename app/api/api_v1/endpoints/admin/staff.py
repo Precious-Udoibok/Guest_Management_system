@@ -4,6 +4,7 @@ from sqlmodel import Session
 
 from app.api import deps, rbac
 from app.core.security import generate_random_password, get_password_hash
+from app.services.email import send_email_to_user
 from app.models import (
     UserRead,
     User,
@@ -38,6 +39,16 @@ def register_staff(
 
     new_staff = ua.create(session, data=data)
 
+    # send the password and email to the user's email
+    send_email_to_user(
+        to_email=data.email,
+        subject="Welcome to CheckPoint (Account Creation)",
+        body=f"""Your account has been created successfully.\n
+        Your login details are: Email: {data.email}, Password: {generated_password}.\n
+        Please change your password after logging in.\n
+        """,
+    )
+
     return ua.update(
         session=session,
         model=new_staff,
@@ -52,12 +63,11 @@ def register_staff(
 def reset_password(
     session: CommonSession,
     staff_id: int,
-    authorized: bool = Depends(rbac.RoleCheck([UserRole.admin])),
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.admin, UserRole.staff])),
     current_user: User = Depends(deps.get_current_active_account),
 ):
     """
     Reset a staff password
-    Email configuration coming soon...
     """
     existing_staff = ua.get(session, id=staff_id)
     if not existing_staff:
@@ -70,6 +80,14 @@ def reset_password(
     generated_password = generate_random_password(10)
 
     # send the newpassword to their email
+    send_email_to_user(
+        to_email=existing_staff.email,
+        subject="CheckPoint (Password Reset)",
+        body=f"""Your password has been reset successfully.\n
+        Your new password is: {generated_password}.\n
+        Please change your password after logging in.\n
+        """,
+    )
 
     return ua.update(
         session=session,

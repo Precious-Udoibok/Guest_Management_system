@@ -25,10 +25,20 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "app"
     DATABASE_URL: str = ""
+    POSTGRES_PORT: str = "5432"
 
     DB_DEBUG_MODE: bool = False
 
     BACKEND_CORS_ORIGINS: list[str] = ["*"]
+
+    SMTP_HOST: str | None = "smtp.gmail.com"
+    SMTP_PORT: int | None = 587
+    SMTP_USER: str | None = "[EMAIL_ADDRESS]"
+    SMTP_PASSWORD: str | None = "123456789"
+    EMAILS_FROM_EMAIL: str | None = ""
+    EMAILS_ENABLED: bool = True
+    SMTP_TLS: bool | None = True
+    EMAILS_FROM_NAME: str = "CheckPoint"
 
     class Config:
         env_file = ".env"

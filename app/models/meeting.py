@@ -1,13 +1,13 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
-from pydantic import EmailStr
 
-from sqlmodel import Relationship, Field
+from pydantic import EmailStr
+from sqlmodel import Field, Relationship
 
 from .base import BaseEnum, ModelBase, SchemaBase
 
 if TYPE_CHECKING:
-    from .user import User  # noqa: F401
+    from .user import User
 
 
 class MeetingStatus(BaseEnum):

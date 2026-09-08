@@ -1,6 +1,6 @@
-from email.message import EmailMessage
-import smtplib
 import logging
+import smtplib
+from email.message import EmailMessage
 from email.utils import formataddr
 
 from app.core.config import settings

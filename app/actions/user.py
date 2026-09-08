@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
-from typing import List
 
-from app.models import User, UserCreate, UserUpdate, UserStatus, UserDepartment
+from app.models import User, UserCreate, UserDepartment, UserStatus, UserUpdate
+
 from .base import ModelAction
 
 
@@ -14,7 +14,7 @@ class UserAction(ModelAction[User, UserCreate, UserUpdate]):
         session: Session,
         status: UserStatus | None = None,
         department: UserDepartment | None = None,
-    ) -> List[User]:
+    ) -> list[User]:
         """
         Function to get all users by either status, department or name
         """

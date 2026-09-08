@@ -1,18 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException
 from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
+from app.actions import user_action as ua
 from app.api import deps, rbac
 from app.core.security import generate_random_password, get_password_hash
-from app.services.email import send_email_to_user
 from app.models import (
-    UserRead,
     User,
-    UserStaffCreate,
+    UserRead,
     UserRole,
+    UserStaffCreate,
     UserStatus,
 )
-from app.actions import user_action as ua
+from app.services.email import send_email_to_user
 
 router = APIRouter()
 
@@ -25,7 +26,7 @@ def register_staff(
     session: CommonSession,
     data: UserStaffCreate,
     authorized: bool = Depends(rbac.RoleCheck([UserRole.admin])),
-    current_user: User = Depends(deps.get_current_active_account),
+    current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ):
     """
     Register a staff
@@ -55,6 +56,7 @@ def register_staff(
         update={
             "role": UserRole.staff,
             "hashed_password": get_password_hash(generated_password),
+            "account_status": UserStatus.active,
         },
     )
 
@@ -64,7 +66,7 @@ def reset_password(
     session: CommonSession,
     staff_id: int,
     authorized: bool = Depends(rbac.RoleCheck([UserRole.admin, UserRole.staff])),
-    current_user: User = Depends(deps.get_current_active_account),
+    current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ):
     """
     Reset a staff password
@@ -100,12 +102,13 @@ def reset_password(
     # return {"message": "Staff password has been reset successfully"}
 
 
-@router.post("/{staff_id}/disable", response_model=UserRead)
+# change to patch
+@router.patch("/{staff_id}/disable", response_model=UserRead)
 def disable_account(
     session: CommonSession,
     staff_id: int,
     authorized: bool = Depends(rbac.RoleCheck([UserRole.admin])),
-    current_user: User = Depends(deps.get_current_active_account),
+    current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ):
     """
     Disable a staff account
@@ -123,12 +126,13 @@ def disable_account(
     return ua.update(session=session, model=staff, update={"account_status": UserStatus.inactive})
 
 
-@router.post("/{staff_id}/enable", response_model=UserRead)
+# change to patch
+@router.patch("/{staff_id}/enable", response_model=UserRead)
 def enable_account(
     session: CommonSession,
     staff_id: int,
     authorized: bool = Depends(rbac.RoleCheck([UserRole.admin])),
-    current_user: User = Depends(deps.get_current_active_account),
+    current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ):
     """
     Enable a staff account

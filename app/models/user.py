@@ -1,8 +1,10 @@
+from typing import TYPE_CHECKING
+
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship
-from typing import List, TYPE_CHECKING
 
 from .base import BaseEnum, ModelBase, SchemaBase
+
 # from .meeting import Meeting
 
 if TYPE_CHECKING:
@@ -47,11 +49,12 @@ class UserBase(ModelBase):
     department: UserDepartment = Field(default=UserDepartment.energy_services)
     availability_status: AvailabilityStatus = Field(default=AvailabilityStatus.available)
     account_status: UserStatus = Field(default=UserStatus.inactive)
+    onboarding_completed: bool = Field(default=False)
 
 
 class User(UserBase, table=True):
     hashed_password: str | None = None
-    meetings: List["Meeting"] = Relationship(back_populates="user")
+    meetings: list["Meeting"] = Relationship(back_populates="user")
 
 
 class UserCreate(SchemaBase):
@@ -88,6 +91,19 @@ class UserUpdate(SchemaBase):
     department: UserDepartment | None = None
     availability_status: AvailabilityStatus | None = None
     account_status: UserStatus | None = None
+
+
+class UserOnboard(SchemaBase):
+    first_name: str
+    last_name: str
+    password: str
+    department: UserDepartment
+
+
+class UserProfile(SchemaBase):
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
 
 
 class UserStaffCreate(SchemaBase):

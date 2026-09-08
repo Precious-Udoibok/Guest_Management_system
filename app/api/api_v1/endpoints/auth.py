@@ -1,14 +1,15 @@
-from fastapi import APIRouter, HTTPException, Depends
+from datetime import datetime, timedelta, timezone
 from typing import Annotated, Any
-from sqlmodel import Session
-from datetime import datetime, timedelta
+
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlmodel import Session
 
 from app.actions import user_action as ua
 from app.api import deps
-from app.core.security import verify_password, create_access_token
 from app.core.config import settings
-from app.models import UserStatus, User
+from app.core.security import create_access_token, verify_password
+from app.models import User, UserStatus
 from app.schemas import Token
 
 router = APIRouter()
@@ -17,7 +18,10 @@ CommonSession = Annotated[Session, Depends(deps.get_session)]
 
 
 @router.post("/login", response_model=Token)
-def login_user(session: CommonSession, form: OAuth2PasswordRequestForm = Depends()) -> Any:
+def login_user(
+    session: CommonSession,
+    form: OAuth2PasswordRequestForm = Depends(),  # noqa: B008
+) -> Any:
     """
     Login user using OAuth2 form to get the access token for future requests
     """
@@ -37,7 +41,7 @@ def login_user(session: CommonSession, form: OAuth2PasswordRequestForm = Depends
         "access_token": create_access_token(
             user.id, secret_key=settings.SECRET_KEY, expiry_minutes=access_token_expires
         ),
-        "expires": datetime.now() + access_token_expires,
+        "expires": datetime.now(timezone.utc) + access_token_expires,
         "token_type": "bearer",
         "account": user,
     }
@@ -45,6 +49,6 @@ def login_user(session: CommonSession, form: OAuth2PasswordRequestForm = Depends
 
 @router.post("/logout")
 def logout(
-    current_user: User = Depends(deps.get_current_active_account),
+    current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ):
     return {"message": "Successfully logged out"}

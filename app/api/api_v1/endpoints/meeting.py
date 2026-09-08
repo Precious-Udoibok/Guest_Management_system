@@ -1,20 +1,22 @@
-from fastapi import APIRouter, HTTPException, Depends, Query, status
+from datetime import datetime, timezone
 from typing import Annotated
-from sqlmodel import Session
-from datetime import datetime
 
-from app.actions import meeting_action as ma, user_action as ua
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlmodel import Session
+
+from app.actions import meeting_action as ma
+from app.actions import user_action as ua
 from app.api import deps, rbac
 from app.models import (
-    MeetingRead,
-    MeetingCreate,
-    UserStatus,
-    MeetingStatus,
     AvailabilityStatus,
-    MeetingReject,
     Meeting,
-    UserRole,
+    MeetingCreate,
+    MeetingRead,
+    MeetingReject,
+    MeetingStatus,
     User,
+    UserRole,
+    UserStatus,
 )
 
 router = APIRouter()
@@ -54,8 +56,8 @@ def get_all_meetings(
     search: str | None = None,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
-    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
-    current_user: User = Depends(deps.get_current_active_account),
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),  # noqa: RUF100, B008
+    current_user: User = Depends(deps.get_current_active_account),  # noqa
 ) -> list[Meeting]:
     """
     Get all meetings by status and search
@@ -89,7 +91,7 @@ def get_staff_meetings(
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
     authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
-    current_user: User = Depends(deps.get_current_active_account),
+    current_user: User = Depends(deps.get_current_active_account),  # noqa
 ) -> list[Meeting]:
     """
     Get all meetings for a specific staff member by user id
@@ -121,7 +123,7 @@ def approve_meeting(
     session: CommonSession,
     id: int,
     authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
-    current_user: User = Depends(deps.get_current_active_account),
+    current_user: User = Depends(deps.get_current_active_account),  # noqa
 ) -> Meeting:
     """
     Approve a specific meeting by id
@@ -160,7 +162,7 @@ def reject_meeting(
     id: int,
     data: MeetingReject,
     authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
-    current_user: User = Depends(deps.get_current_active_account),
+    current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ) -> Meeting:
     """
     Reject a specific meeting by id
@@ -187,7 +189,7 @@ def complete_meeting(
     session: CommonSession,
     id: int,
     authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
-    current_user: User = Depends(deps.get_current_active_account),
+    current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ) -> Meeting:
     """
     Complete a specific meeting by id by setting the status to completed
@@ -208,7 +210,7 @@ def complete_meeting(
     completed_meeting = ma.update(
         session,
         model=meeting,
-        update={"status": MeetingStatus.completed, "check_out_time": datetime.now()},
+        update={"status": MeetingStatus.completed, "check_out_time": datetime.now(timezone.utc)},
     )
 
     if meeting.user:

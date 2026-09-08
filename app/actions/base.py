@@ -1,6 +1,7 @@
-from typing import Any, Generic, TypeVar, Optional, Type, List
+from typing import Any, Generic, TypeVar
+
 from pydantic import BaseModel
-from sqlmodel import SQLModel, Session, select, or_
+from sqlmodel import Session, SQLModel, or_, select
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -10,36 +11,36 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 class ModelAction(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     """Base class for CRUD operations."""
 
-    def __init__(self, model: Type[ModelType]):
+    def __init__(self, model: type[ModelType]):
         self.model = model  # get the model class
 
-    def get(self, session: Session, id: int) -> Optional[ModelType]:
+    def get(self, session: Session, id: int) -> ModelType | None:
         """
         Retrieve a model instance by its ID.
         """
         return session.get(self.model, id)
 
-    def get_all(self, session: Session) -> List[ModelType]:
+    def get_all(self, session: Session) -> list[ModelType]:
         """
         Get all instances of the model.
         """
         return session.exec(select(self.model)).all()
 
-    def get_by_email(self, session: Session, email: str) -> Optional[ModelType]:
+    def get_by_email(self, session: Session, email: str) -> ModelType | None:
         """
         Get a model instance by email
         """
         statement = select(self.model).where(self.model.email == email.lower())
         return session.exec(statement).first()
 
-    def get_by_phone(self, session: Session, phone: str) -> Optional[ModelType]:
+    def get_by_phone(self, session: Session, phone: str) -> ModelType | None:
         """
         Get a model instance by phone
         """
         statement = select(self.model).where(self.model.phone == phone)
         return session.exec(statement).first()
 
-    def create(self, session: Session, *, data: CreateSchemaType) -> Optional[ModelType]:
+    def create(self, session: Session, *, data: CreateSchemaType) -> ModelType | None:
         """
         Create a new model instance.
         """
@@ -85,7 +86,7 @@ class ModelAction(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             session.rollback()
             raise
 
-    def delete(self, session: Session, id: int) -> Optional[ModelType]:
+    def delete(self, session: Session, id: int) -> ModelType | None:
         """
         Delete the selected model instance data by id
         """
@@ -110,7 +111,7 @@ class ModelAction(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         filters: list[Any] | None = None,
         offset: int = 0,
         limit: int = 100,
-    ) -> List[ModelType]:
+    ) -> list[ModelType]:
         statement = select(self.model)
 
         if filters:

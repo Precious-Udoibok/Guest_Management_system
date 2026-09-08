@@ -1,20 +1,22 @@
-from .user import (
-    User,
-    UserCreate,
-    UserRead,
-    UserUpdate,
-    UserStatus,
-    UserDepartment,
-    AvailabilityStatus,
-    UserRole,
-    UserStaffCreate,
-    UserPublic,
-)
 from .meeting import (
     Meeting,
-    MeetingRead,
-    MeetingStatus,
     MeetingCreate,
-    MeetingUpdate,
+    MeetingRead,
     MeetingReject,
+    MeetingStatus,
+    MeetingUpdate,
+)
+from .user import (
+    AvailabilityStatus,
+    User,
+    UserCreate,
+    UserDepartment,
+    UserOnboard,
+    UserProfile,
+    UserPublic,
+    UserRead,
+    UserRole,
+    UserStaffCreate,
+    UserStatus,
+    UserUpdate,
 )

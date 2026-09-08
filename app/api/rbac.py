@@ -1,7 +1,7 @@
-from fastapi import HTTPException, Depends
+from fastapi import Depends, HTTPException
 
 from app.api.deps import get_current_active_account
-from app.models import UserRole, User
+from app.models import User, UserRole
 
 
 class RoleCheck:
@@ -10,7 +10,7 @@ class RoleCheck:
 
     def __call__(
         self,
-        user: User = Depends(get_current_active_account),
+        user: User = Depends(get_current_active_account),  # noqa: B008
     ) -> User:
         if user.role not in self.required_roles:
             raise HTTPException(

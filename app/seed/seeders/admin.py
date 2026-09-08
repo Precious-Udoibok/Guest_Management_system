@@ -1,9 +1,11 @@
+import logging
+
 from sqlmodel import Session, select
-from app.db.session import engine
-from app.models import User, UserRole, AvailabilityStatus, UserStatus, UserDepartment
+
 from app.core.config import settings
 from app.core.security import get_password_hash
-import logging
+from app.db.session import engine
+from app.models import AvailabilityStatus, User, UserDepartment, UserRole, UserStatus
 
 logger = logging.getLogger(__name__)
 

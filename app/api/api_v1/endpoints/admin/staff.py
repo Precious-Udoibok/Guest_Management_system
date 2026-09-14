@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 
 from app.actions import user_action as ua
@@ -13,7 +13,7 @@ from app.models import (
     UserStaffCreate,
     UserStatus,
 )
-from app.services.email import send_email_to_user
+from app.services.email import EmailDeliveryError, send_email_to_user
 
 router = APIRouter()
 
@@ -38,17 +38,24 @@ def register_staff(
     # password
     generated_password = generate_random_password(10)
 
-    new_staff = ua.create(session, data=data)
-
     # send the password and email to the user's email
-    send_email_to_user(
-        to_email=data.email,
-        subject="Welcome to CheckPoint (Account Creation)",
-        body=f"""Your account has been created successfully.\n
-        Your login details are: Email: {data.email}, Password: {generated_password}.\n
-        Please change your password after logging in.\n
-        """,
-    )
+
+    try:
+        send_email_to_user(
+            to_email=data.email,
+            subject="Welcome to CheckPoint (Account Creation)",
+            body=f"""Your account has been created successfully.\n
+            Your login details are: Email: {data.email}, Password: {generated_password}.\n
+            Please change your password after logging in.\n
+            """,
+        )
+    except EmailDeliveryError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Staff account could not be created because the welcome email could not be sent",
+        ) from exc
+
+    new_staff = ua.create(session, data=data)
 
     return ua.update(
         session=session,
@@ -82,14 +89,20 @@ def reset_password(
     generated_password = generate_random_password(10)
 
     # send the newpassword to their email
-    send_email_to_user(
-        to_email=existing_staff.email,
-        subject="CheckPoint (Password Reset)",
-        body=f"""Your password has been reset successfully.\n
-        Your new password is: {generated_password}.\n
-        Please change your password after logging in.\n
-        """,
-    )
+    try:
+        send_email_to_user(
+            to_email=existing_staff.email,
+            subject="CheckPoint (Password Reset)",
+            body=f"""Your password has been reset successfully.\n
+            Your new password is: {generated_password}.\n
+            Please change your password after logging in.\n
+            """,
+        )
+    except EmailDeliveryError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Password could not be reset because the email could not be sent",
+        ) from exc
 
     return ua.update(
         session=session,

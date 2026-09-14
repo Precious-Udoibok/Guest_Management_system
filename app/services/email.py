@@ -8,9 +8,13 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 
+class EmailDeliveryError(RuntimeError):
+    """Raised when an email cannot be delivered."""
+
+
 def send_email_to_user(to_email: str, subject: str, body: str):
     if not settings.EMAILS_ENABLED:
-        raise RuntimeError("no provided configuration for email variables")
+        raise EmailDeliveryError("email delivery is not configured")
 
     server = None
     try:
@@ -27,11 +31,15 @@ def send_email_to_user(to_email: str, subject: str, body: str):
         server.send_message(from_addr=settings.SMTP_USER, to_addrs=to_email, msg=msg)
         logger.info("Email sent successfully")
 
-    except Exception as e:
-        logger.error(f"Failed to send email: {e}")
-        raise
+    except Exception as exc:
+        logger.exception("Failed to send email to %s", to_email)
+        raise EmailDeliveryError("email delivery failed") from exc
 
     finally:
         if server is not None:
-            server.quit()
-            logger.info("Connection closed")
+            try:
+                server.quit()
+            except Exception:
+                logger.exception("Failed to close the email server connection")
+            else:
+                logger.info("Connection closed")

@@ -56,8 +56,8 @@ def get_all_meetings(
     search: str | None = None,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
-    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),  # noqa: RUF100, B008
-    current_user: User = Depends(deps.get_current_active_account),  # noqa
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),  # noqa: B008
+    current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ) -> list[Meeting]:
     """
     Get all meetings by status and search
@@ -90,8 +90,8 @@ def get_staff_meetings(
     search: str | None = None,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
-    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
-    current_user: User = Depends(deps.get_current_active_account),  # noqa
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),  # noqa: B008
+    current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ) -> list[Meeting]:
     """
     Get all meetings for a specific staff member by user id
@@ -122,7 +122,7 @@ def get_staff_meetings(
 def approve_meeting(
     session: CommonSession,
     id: int,
-    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),  # noqa
     current_user: User = Depends(deps.get_current_active_account),  # noqa
 ) -> Meeting:
     """
@@ -161,7 +161,7 @@ def reject_meeting(
     session: CommonSession,
     id: int,
     data: MeetingReject,
-    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),  # noqa: B008
     current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ) -> Meeting:
     """
@@ -188,7 +188,7 @@ def reject_meeting(
 def complete_meeting(
     session: CommonSession,
     id: int,
-    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),
+    authorized: bool = Depends(rbac.RoleCheck([UserRole.staff])),  # noqa: B008
     current_user: User = Depends(deps.get_current_active_account),  # noqa: B008
 ) -> Meeting:
     """

@@ -39,6 +39,7 @@ redis = "^4.6.0"
 tenacity = "^8.2.0"
 
 faker = "^19.1.0"
+resend = "^2.44.0"
 
 
 [tool.poetry.group.dev.dependencies]

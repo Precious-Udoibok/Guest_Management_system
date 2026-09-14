@@ -28,10 +28,3 @@ async def root():
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-import socket
-
-if socket.create_connection(("smtp.gmail.com", 587), timeout=10):
-    print("SMTP server is reachable")
-
-else:
-    print("SMTP server is not reachable")

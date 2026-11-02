@@ -15,6 +15,8 @@ def send_email_to_user(to_email: str, subject: str, body: str):
     if not settings.EMAILS_ENABLED:
         raise EmailDeliveryError("email delivery is not configured")
 
+    logger.info("Sending email to %s with subject: %s", to_email, subject)
+    logger.info("api_key: %s", settings.BREVO_API_KEY)
     try:
         response = httpx.post(
             "https://api.brevo.com/v3/smtp/email",
@@ -34,9 +36,11 @@ def send_email_to_user(to_email: str, subject: str, body: str):
             },
             timeout=10,
         )
+        logger.info("Email sent to %s with status code %s", to_email, response.status_code)
+        logger.info("api_key: %s", settings.BREVO_API_KEY)
         response.raise_for_status()
         logger.info("Email sent successfully")
 
     except Exception as exc:
         logger.exception("Failed to send email to %s", to_email)
-        raise EmailDeliveryError("Email delivery failed") from exc
+        raise EmailDeliveryError(f"""{exc}\nEmail delivery failed""") from exc

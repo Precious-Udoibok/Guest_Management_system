@@ -41,6 +41,10 @@ def send_email_to_user(to_email: str, subject: str, body: str):
         response.raise_for_status()
         logger.info("Email sent successfully")
 
+        if response.is_error:
+            logger.error("Brevo responded %s: %s", response.status_code, response.text)
+            response.raise_for_status()
+
     except Exception as exc:
         logger.exception("Failed to send email to %s", to_email)
         raise EmailDeliveryError(f"""{exc}\nEmail delivery failed""") from exc

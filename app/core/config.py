@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     SMTP_TLS: bool | None = True
     EMAILS_FROM_NAME: str = "CheckPoint"
     RESEND_API_KEY: str | None = ""
+    BREVO_API_KEY: str | None = ""
 
     class Config:
         env_file = ".env"

@@ -49,10 +49,11 @@ def register_staff(
             Please change your password after logging in.\n
             """,
         )
-    except EmailDeliveryError as exc:
+    except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Staff account could not be created because the welcome email could not be sent",
+            detail=f"""{exc}Staff account could not be created\n
+            because the welcome email could not be sent""",
         ) from exc
 
     new_staff = ua.create(session, data=data)
